@@ -1,0 +1,128 @@
+#include "main.h"
+#include "string.h"
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+uint8_t Receive_data[3];
+uint8_t Returns_data[11]="@SERVER_RUN";
+uint8_t Returns_data1[12]="@SERVER_STOP";
+uint8_t Compare_data1[11]="@RESPON_RUN";
+uint8_t Compare_data2[12]="@RESPON_STOP";
+uint8_t AT_data1[]="AT+ECHO=0";
+uint8_t AT_data2[]="AT+CGCLASS=\"B\"";
+uint8_t AT_data3[]="AT+CGDCONT=1,\"IP\",\"CMNET\"";
+uint8_t AT_data4[]="AT+CGATT=1";
+uint8_t AT_data5[]="AT+CIPCSGP=1,\"CMNET\"";
+uint8_t AT_data6[]="AT+CIPSTART=\"TCP\",\"@SERVER_IP\",\"@SERVER_PORT\"";
+/* USER CODE END Includes */
+ 
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+ 
+/* USER CODE END PTD */
+ 
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+ 
+/* USER CODE END PD */
+ 
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+ 
+/* USER CODE END PM */
+ 
+/* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart1;
+ 
+/* USER CODE BEGIN PV */
+ 
+/* USER CODE END PV */
+ 
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+static void MX_GPIO_Init(void);
+static void MX_USART1_UART_Init(void);
+ 
+/* USER CODE BEGIN PFP */
+ 
+/* USER CODE END PFP */
+ 
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+ 
+void sim900a_init(){
+HAL_Delay(2000);
+HAL_UART_Transmit(&huart1, AT_data1, sizeof(AT_data1), 10);
+HAL_Delay(1000);
+HAL_UART_Transmit(&huart1, AT_data2, sizeof(AT_data2), 10);
+HAL_Delay(1000);
+HAL_UART_Transmit(&huart1, AT_data3, sizeof(AT_data3), 10);
+HAL_Delay(1000);
+HAL_UART_Transmit(&huart1, AT_data4, sizeof(AT_data4), 10);
+HAL_Delay(1000);
+HAL_UART_Transmit(&huart1, AT_data5, sizeof(AT_data5), 10);
+HAL_Delay(1000);
+HAL_UART_Transmit(&huart1, AT_data6, sizeof(AT_data6), 10);
+HAL_Delay(1000);
+}
+ 
+ 
+/* USER CODE END 0 */
+ 
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+ 
+  /* USER CODE END 1 */
+ 
+  /* MCU Configuration--------------------------------------------------------*/
+ 
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+ 
+  /* USER CODE BEGIN Init */
+ 
+  /* USER CODE END Init */
+ 
+  /* Configure the system clock */
+  SystemClock_Config();
+ 
+  /* USER CODE BEGIN SysInit */
+ 
+  /* USER CODE END SysInit */
+ 
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_USART1_UART_Init();
+  /* USER CODE BEGIN 2 */
+    sim900a_init();
+  /* USER CODE END 2 */
+ 
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
+ 
+    /* USER CODE BEGIN 3 */
+ 
+	 HAL_UART_Receive(&huart1, Receive_data, sizeof(Receive_data), 100);
+	 if(strcmp((char*)Receive_data,(char*)Compare_data1)==0)
+	 {
+		 HAL_UART_Transmit(&huart1, Returns_data, 11, 100);
+		 HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+		 Receive_data[0]='0';
+	 }
+ 
+	 if(strcmp((char*)Receive_data,(char*)Compare_data2)==0)
+	 	 {
+	 		 HAL_UART_Transmit(&huart1, Returns_data1, 12, 100);
+	 		 HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+	 		Receive_data[0]='0';
+	 	 }
+  }
+  /* USER CODE END 3 */
+}

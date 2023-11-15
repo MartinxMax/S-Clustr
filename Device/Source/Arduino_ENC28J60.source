@@ -1,0 +1,46 @@
+#include <UIPEthernet.h>
+const String DEVICE_TYPE = "{\"TYPE\":\"Arduino\"}";
+const char* REMOTE_IP = "@SERVER_IP";
+const char* REMOTE_PORT = "@SERVER_PORT";
+const char* RECV_RUN_COMMAND = "@SERVER_RUN";
+const char* RECV_STOP_COMMAND = "@SERVER_STOP";
+const char* RECV_HEARTBEAT = "HP";
+const char* RESPONSE_RUN_COMMAND = "@RESPON_RUN";
+const char* RESPONSE_STOP_COMMAND = "@RESPON_STOP";
+const char* RESPONSE_HEARTBEAT = "Heartbeat.";
+const char* DEVICE_NAME = "ArduinoNuo";
+const int BAUDRATE = 9600;
+
+byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED }; 
+IPAddress serverIP; 
+EthernetClient client;
+
+void setup() {
+  Ethernet.begin(mac); 
+  Serial.begin(BAUDRATE); 
+  delay(1000); 
+  pinMode(8, OUTPUT); 
+  digitalWrite(8, LOW);
+  serverIP.fromString(REMOTE_IP);
+ if (client.connect(serverIP, atoi(REMOTE_PORT))) {
+  delay(2000);
+  client.println(DEVICE_TYPE);  
+} else {
+  delay(5000);
+  return;
+}
+}
+
+void loop() {
+  if (client.available()) {  
+    String data = client.readStringUntil('\n');  
+    Serial.println(data); 
+    if (data == RECV_RUN_COMMAND) { 
+      digitalWrite(8, HIGH);  
+      client.println(RESPONSE_RUN_COMMAND); 
+    } else if (data == RECV_STOP_COMMAND) { 
+      digitalWrite(8, LOW);  
+      client.println(RESPONSE_STOP_COMMAND); 
+    } 
+  }
+}

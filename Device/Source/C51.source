@@ -1,0 +1,105 @@
+#include <reg52.h>
+#include <stdio.h>
+#include <string.h>
+#define RX_BUFFER_SIZE 10
+#define RECV_RUN_COMMAND "@SERVER_RUN"
+#define RECV_STOP_COMMAND "@SERVER_STOP"	
+#define RECV_HEARTBEAT "HP"
+#define RESPONSE_RUN_COMMAND "@RESPON_RUN"	  
+#define RESPONSE_STOP_COMMAND "@RESPON_STOP"
+#define RESPONSE_HEARTBEAT "Heartbeat."
+#define DEVICE "{\"TYPE\":\"C51\"}"
+
+sbit relay=P1^0;
+volatile bit rxFlag = 0;
+volatile unsigned char rxBuffer[RX_BUFFER_SIZE];
+volatile unsigned char rxIndex = 0;
+void uartSendResponse(unsigned char *response);
+void uartSendString(unsigned char *str);
+void delay_ms(unsigned int milliseconds);
+void delay_ms(unsigned int milliseconds) {
+    unsigned int i, j;
+    for (i = 0; i < milliseconds; i++) {
+        for (j = 0; j < 114; j++);
+    }
+}
+
+void sim900a_init(){
+delay_ms(2000);
+uartSendResponse("AT+ECHO=0");
+delay_ms(1000);
+uartSendResponse("AT+CGCLASS=\"B\"");
+delay_ms(1000);
+uartSendResponse("AT+CGDCONT=1,\"IP\",\"CMNET\"");
+delay_ms(1000);
+uartSendResponse("AT+CGATT=1");
+delay_ms(1000);
+uartSendResponse("AT+CIPCSGP=1,\"CMNET\"");
+delay_ms(1000);
+uartSendResponse("AT+CIPSTART=\"TCP\",\"@SERVER_IP\",\"@SERVER_PORT\"");
+delay_ms(1000);
+}
+
+void uartInit() {
+  TMOD |= 0x20;  
+  TH1 = 0xFD;   
+  SCON = 0x50;    
+  TR1 = 1;       	
+  ES = 1;       
+  EA = 1;      
+}
+
+void uartSendString(unsigned char *str) {
+  while (*str) {
+    SBUF = *str++;
+    while (!TI)
+      ;
+    TI = 0;
+  }
+}
+
+void uartSendResponse(unsigned char *response) {
+  uartSendString(response);
+}
+
+void uartReceiveHandler() interrupt 4 {
+  if (RI) {
+    RI = 0;
+    rxBuffer[rxIndex] = SBUF;
+    if (rxBuffer[rxIndex] == '\r' || rxBuffer[rxIndex] == '\n') {
+      rxBuffer[rxIndex] = '\0'; 
+      rxFlag = 1;
+      rxIndex = 0; 
+    } else {
+      rxIndex++;
+      if (rxIndex >= RX_BUFFER_SIZE - 1) {
+        rxBuffer[rxIndex] = '\0';
+        rxIndex = 0; 
+      }
+    }
+  }
+}
+
+void processReceivedData() {
+  if (rxFlag) {
+    if (strcmp(rxBuffer, RECV_RUN_COMMAND) == 0) {
+      uartSendResponse(RESPONSE_RUN_COMMAND);
+	  relay=1;
+    } else if (strcmp(rxBuffer, RECV_STOP_COMMAND) == 0) {
+      uartSendResponse(RESPONSE_STOP_COMMAND);
+	  relay=0;
+    } 
+    rxFlag = 0;
+  }
+}
+
+void main() {
+	relay=0;
+  uartInit();
+  sim900a_init();
+  delay_ms(3000);
+  uartSendResponse(DEVICE);
+  while (1) {
+    processReceivedData();
+  }
+}

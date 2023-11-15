@@ -1,0 +1,48 @@
+#include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+
+const String DEVICE_TYPE = "{\"TYPE\":\"ESP8266\"}";
+const char* REMOTE_IP = "@SERVER_IP";
+const char* REMOTE_PORT = "@SERVER_PORT";
+const char* SSID = "@SSID";
+const char* PASSWORD = "@PASSWORD";
+const char* RECV_RUN_COMMAND = "@SERVER_RUN";
+const char* RECV_STOP_COMMAND = "@SERVER_STOP";
+const char* RECV_HEARTBEAT = "HP";
+const char* RESPONSE_RUN_COMMAND = "@RESPON_RUN";
+const char* RESPONSE_STOP_COMMAND = "@RESPON_STOP";
+const char* RESPONSE_HEARTBEAT = "Heartbeat.";
+const int BAUDRATE = 9600;
+
+WiFiClient client;
+
+void setup() {
+  pinMode(16, OUTPUT);
+  digitalWrite(16, LOW);
+  Serial.begin(BAUDRATE);
+  delay(5000);
+  WiFi.begin(SSID, PASSWORD);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+  }
+
+  if (!client.connect(REMOTE_IP, atoi(REMOTE_PORT))) {
+    return;
+  }
+  client.println(DEVICE_TYPE);
+}
+
+void loop() {
+  if (client.available()) {
+    String data = client.readStringUntil('\n');
+    if (data == RECV_RUN_COMMAND) {
+      digitalWrite(16, HIGH);
+      delay(100);
+      client.println(RESPONSE_RUN_COMMAND);
+    } else if (data == RECV_STOP_COMMAND) {
+      digitalWrite(16, LOW);
+      delay(100);
+      client.println(RESPONSE_STOP_COMMAND);
+    }
+  }
+}

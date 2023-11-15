@@ -1,0 +1,116 @@
+const String DEVICE_TYPE = "{\"TYPE\":\"Arduino\"}";
+const char* REMOTE_IP = "@SERVER_IP";
+const char* REMOTE_PORT = "@SERVER_PORT";
+const char* RECV_RUN_COMMAND = "@SERVER_RUN";
+const char* RECV_STOP_COMMAND = "@SERVER_STOP";
+const char* RECV_HEARTBEAT = "HP";
+const char* RESPONSE_RUN_COMMAND = "@RESPON_RUN";
+const char* RESPONSE_STOP_COMMAND = "@RESPON_STOP";
+const char* RESPONSE_HEARTBEAT = "Heartbeat.";
+const char* DEVICE_NAME = "ArduinoNuo";
+const int BAUDRATE = 9600;
+int flag = 0;
+
+void sendMSG(const String& message);
+void processString(const String& str);
+String readSerialString();
+void click();
+void GMS_init();
+
+void setup() {
+  Serial.begin(BAUDRATE);
+  pinMode(A0, OUTPUT);
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  digitalWrite(A0, LOW);
+  digitalWrite(2, HIGH);
+  digitalWrite(3, HIGH);
+  digitalWrite(4, HIGH);
+  digitalWrite(5, HIGH);
+  digitalWrite(6, HIGH);
+  GMS_init();
+  delay(2000);
+  sendMSG(DEVICE_TYPE);
+}
+
+void loop() {
+  if (flag) {
+    if (Serial.available()) {
+      String receivedString = readSerialString();
+      if (receivedString.length() > 0) {
+        processString(receivedString);
+      }
+    } else {
+      delay(100);
+    }
+  }
+}
+
+void GMS_init() {
+  Serial.println("AT+ECHO=0");
+  delay(1000);
+  Serial.flush();
+  Serial.println("AT+CGCLASS=\"B\"");
+  delay(1000);
+  Serial.flush();
+  digitalWrite(2, LOW);
+  Serial.println("AT+CGDCONT=1,\"IP\",\"CMNET\"");
+  delay(1000);
+  Serial.flush();
+  digitalWrite(3, LOW);
+  Serial.println("AT+CGATT=1");
+  delay(1000);
+  Serial.flush();
+  digitalWrite(4, LOW);
+  Serial.println("AT+CIPCSGP=1,\"CMNET\"");
+  delay(1000);
+  Serial.flush();
+  digitalWrite(5, LOW);
+  Serial.println("AT+CIPSTART=\"TCP\",\"" + String(REMOTE_IP) + "\",\"" + String(REMOTE_PORT) + "\"");
+  delay(1000);
+  Serial.flush();
+  digitalWrite(6, LOW);
+  flag = 1;
+}
+
+
+void sendMSG(const String& message) {
+  delay(2000);
+  Serial.flush();
+  Serial.println("AT+CIPSEND");
+  delay(1000);
+  Serial.println(message);
+  delay(1000);
+  Serial.write(0x1A);
+  Serial.flush();
+  delay(2000);
+}
+
+
+String readSerialString() {
+  String receivedString = "";
+  while (Serial.available()) {
+    char receivedChar = Serial.read();
+    if (receivedChar == '\n' || receivedChar == '\r') {
+      break;
+    }
+    delay(10);
+    receivedString += receivedChar;
+  }
+  Serial.flush();
+  return receivedString;
+}
+
+
+void processString(const String& str) {
+  if (str == RECV_RUN_COMMAND) {
+    digitalWrite(A0, HIGH);
+    sendMSG(RESPONSE_RUN_COMMAND);
+  } else if (str == RECV_STOP_COMMAND) {
+    digitalWrite(A0, LOW);
+    sendMSG(RESPONSE_STOP_COMMAND);
+  }
+}
