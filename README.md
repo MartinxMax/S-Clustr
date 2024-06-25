@@ -11,20 +11,24 @@
 </p>
  </p>
 
+
 <div style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 8px; padding: 16px; max-width: 400px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
     <img src="https://avatars.githubusercontent.com/u/85664564?v=4" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; margin-right: 16px;">
     <div style="display: flex; flex-direction: column;">
         <span style="font-size: 1.5em; font-weight: bold;">Maptnh</span>
-        <span style="font-style: italic; color: #555;">Do not limit your actions to the virtual world.</span>
+        <span style="font-style: italic; color: #555;">Не ограничивайте свои действия виртуальным миром.</span>
         <a href="https://github.com/MartinxMax" target="_blank" style="margin-top: 8px; color: #0366d6; text-decoration: none; font-weight: bold;">GitHub: Maptnh</a>
     </div>
 </div>
+
+
+
 
 <div style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 8px; padding: 16px; max-width: 400px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
     <img src="https://avatars.githubusercontent.com/u/111223723?v=4" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; margin-right: 16px;">
     <div style="display: flex; flex-direction: column;">
         <span style="font-size: 1.5em; font-weight: bold;">Jay Steinberg</span>
-        <span style="font-style: italic; color: #555;">You cannot kill people you hate in the virtual world.</span>
+        <span style="font-style: italic; color: #555;">Man kann die Menschen, die man hasst, in der virtuellen Welt nicht töten.</span>
         <a href="https://github.com/MartMakr" target="_blank" style="margin-top: 8px; color: #0366d6; text-decoration: none; font-weight: bold;">GitHub: jaysteinberg</a>
     </div>
 </div>
