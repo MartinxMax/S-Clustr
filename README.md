@@ -1,5 +1,5 @@
 <h1 align="center" style="color: #00FF00; font-family: 'Lucida Console', Monaco, monospace; text-shadow: 2px 2px 10px #FF0000, 4px 4px 20px #000000; font-size: 3em;">
-  S-Clustr (Shadow Clustr)
+  S-Clustr (Shadow Cluster)
 </h1>
 <p align="center">
   <img src="https://img.shields.io/badge/Java-20-darkviolet" alt="Java-20" style="margin-right: 10px;">
