@@ -1,0 +1,64 @@
+{
+  "Device": {
+    "1": {
+      "TYPE": "ARDU",
+      "ENCRYPTO": false,
+      "RUN": "Arduino-RUN",
+      "STOP": "Arduino-STOP",
+      "Remark": "Ardunio"
+    },
+    "2": {
+      "TYPE": "ST32",
+      "ENCRYPTO": false,
+      "RUN": "STM32-RUN",
+      "STOP": "STM32-STOP",
+      "Remark": "STM32"
+    },
+    "3": {
+      "TYPE": "PC",
+      "ENCRYPTO": false,
+      "RUN": "PC-RUN",
+      "STOP": "PC-STOP",
+      "Remark": "PC"
+    },
+    "4": {
+      "TYPE": "AIR7",
+      "ENCRYPTO": false,
+      "RUN": "AIR780E-RUN",
+      "STOP": "AIR780E-STOP",
+      "Remark": "AIR780E"
+    },
+    "5": {
+      "TYPE": "ESP8",
+      "ENCRYPTO": false,
+      "RUN": "ESP8266-RUN",
+      "STOP": "ESP8266-STOP",
+      "Remark": "AIR780E"
+    },
+    "6": {
+      "TYPE": "C51",
+      "ENCRYPTO": false,
+      "RUN": "C51-RUN",
+      "STOP": "C51-STOP",
+      "Remark": "C51"
+    },
+    "7": {
+      "TYPE": "Ne3e",
+      "ENCRYPTO": false,
+      "RUN": "Nets3e-RUN",
+      "STOP": "Nets3e-STOP",
+      "Remark": "Nets3e"
+    },
+    "8": {
+      "TYPE": "PS120",
+      "ENCRYPTO": false,
+      "RUN": "PLC-S7-1200-RUN",
+      "STOP": "PLC-S7-1200-STOP",
+      "Remark": "PLC-S7-1200"
+    }
+  },
+  "SERVER": {
+    "NODE_TIMEOUT": 1000,
+    "MAX_DEV":50000
+  }
+}
